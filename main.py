@@ -1,9 +1,9 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from patientAPI import patient_api
 import os
 import sqlalchemy
-import models
+# import models
 
 app = Flask(__name__)
 
@@ -21,10 +21,46 @@ db_socket_dir = os.environ.get("/cloudsql")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'ThisIsSecretKey'
 app.config['SQLALCHEMY_DATABASE_URI']= 'mysql+mysqlconnector://' + db_user + ':' + db_password + '@35.227.99.155/patient_db?auth_plugin=mysql_native_password'
+db = SQLAlchemy(app)
 
-# models.init_app(app)
-# models.create_tables(app)
+
+class Patient(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(80), nullable=False)
+    last_name = db.Column(db.String(80), nullable=False)
+    address = db.Column(db.String(80), nullable=False)
+    date_of_birth = db.Column(db.String(20), nullable=False)
+    postal_code = db.Column(db.String(20), nullable=False)
+    breathing_difficulty = db.Column(db.Integer, nullable=False)
+    conscious = db.Column(db.Boolean, nullable=False)
+    pain = db.Column(db.Integer, nullable=False)
+    bleeding = db.Column(db.String(30), nullable=False)
+    additional_info = db.Column(db.String(500), nullable=False)
+
+
+
+db.create_all()
+db.session.commit()
 app.register_blueprint(patient_api)
+
+
+@app.route('/patient/add', methods=['POST'])
+def add_patient():
+    data = request.get_json()
+    patient = Patient(first_name=data['first_name'],
+                      last_name=data['last_name'],
+                      address=data['address'],
+                      date_of_birth=data['date_of_birth'],
+                      postal_code=data['postal_code'],
+                      breathing_difficulty=data['breathing_difficulty'],
+                      conscious=data['conscious'],
+                      pain=data['pain'],
+                      bleeding=data['bleeding'],
+                      additional_info=data['additional_info']
+                      )
+    db.session.add(patient)
+    db.session.commit()
+    return jsonify({"message": "Patient added"})
 
 
 @app.route('/')
@@ -34,3 +70,4 @@ def hello_world():
 
 if __name__ == '__main__':
     app.run()
+
