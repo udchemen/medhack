@@ -64,7 +64,7 @@ def get_priority_patient():
         #return jsonify({'patients': helper_functions.combine_results(patients)})
         return jsonify({'patients': next_patient})
     else:
-        return jsonify({'patients': helper_functions.combine_results(patients)})
+        return jsonify({'patients': None})
 
 # helper function - can be moved to a different file if you want
 
@@ -97,7 +97,7 @@ def add_patient():
     db.session.add(patient)
     db.session.commit()
     # Adding elements to the heap
-    priority_index = sum_values(patient)
+    priority_index = -1 * sum_values(patient)
     print(f"priority_index: {priority_index}")
     heapq.heappush(h, (priority_index, patient.public_id))
     #print(new_uuid)
