@@ -74,7 +74,11 @@ def sum_values(patient):
     bleeding_value = patient.bleeding #patients[i]['bleeding']
     # if conscious == False, give 1
     # unconscious --> 8
-    sum = patient.breathing_difficulty + int(patient.conscious == False) + patient.pain + bleeding_dict[bleeding_value]
+    if (patient.conscious == False):
+        conscious_num = 8
+    else:
+        conscious_num = 0
+    sum = patient.breathing_difficulty +conscious_num + patient.pain + bleeding_dict[bleeding_value]
     return sum
 
 @app.route('/patient/add', methods=['POST'])
