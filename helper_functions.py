@@ -10,7 +10,8 @@ def combine_results(patients):
 
 
 def allocate_data(patient):
-    patient_data = {'first_name': patient.first_name,
+    patient_data = {'id': patient.id,
+                    'first_name': patient.first_name,
                     'last_name': patient.last_name,
                     'address': patient.address,
                     'date_of_birth': patient.date_of_birth,

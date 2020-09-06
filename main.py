@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from patientAPI import patient_api
 import os
+import heap
 import sqlalchemy
 import helper_functions
 
@@ -49,6 +50,7 @@ app.register_blueprint(patient_api)
 @app.route('/patients', methods=['GET'])
 def get_all_patients():
     patients = Patient.query.filter(Patient.treated.like('0'))
+    heap.arrange_into_heap(helper_functions.combine_results(patients))
 
     return jsonify({'patients': helper_functions.combine_results(patients)})
 
@@ -56,7 +58,8 @@ def get_all_patients():
 @app.route('/patient/add', methods=['POST'])
 def add_patient():
     data = request.get_json()
-    patient = Patient(first_name=data['first_name'],
+    patient = Patient(id=data['id'],
+                      first_name=data['first_name'],
                       last_name=data['last_name'],
                       address=data['address'],
                       date_of_birth=data['date_of_birth'],
