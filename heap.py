@@ -20,25 +20,25 @@ def sum_values(patients, i):
 # numbers indicating patient health
 
 order_patient = {}
-def arrange_into_heap(patients):
-
-    for i in range(len(patients)):
-        print(patients[i])
-        # make all values negative so that it's a max heap
-        order_patient[patients[i]['id']] = - sum_values(patients, i)
-    print(f"order_patient: {order_patient}")
-    #heapify values of order_patient dict
-    list_values = list(order_patient.values())
-    arranged = heapq.heapify(list_values)
-    # heapified values
-    print(list_values)
-
-    for l in list_values:
-        print(l.get)
-    #return person of highest priority
-    priority = heapq.heappop(list_values)
-    #print(pr)
-    return priority
+# def arrange_into_heap(patients):
+#
+#     for i in range(len(patients)):
+#         print(patients[i])
+#         # make all values negative so that it's a max heap
+#         order_patient[patients[i]['id']] = - sum_values(patients, i)
+#     print(f"order_patient: {order_patient}")
+#     #heapify values of order_patient dict
+#     list_values = list(order_patient.values())
+#     arranged = heapq.heapify(list_values)
+#     # heapified values
+#     print(list_values)
+#
+#     for l in list_values:
+#         print(l.get)
+#     #return person of highest priority
+#     priority = heapq.heappop(list_values)
+#     #print(pr)
+#     return priority
 
 
 

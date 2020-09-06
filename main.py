@@ -6,6 +6,8 @@ import heap
 import sqlalchemy
 import helper_functions
 import uuid
+import heapq
+
 
 # import models
 
@@ -27,6 +29,8 @@ app.config[
     'SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://' + db_user + ':' + db_password + '@35.227.99.155/patient_db?auth_plugin=mysql_native_password'
 db = SQLAlchemy(app)
 
+# creating a heap
+h = []
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,12 +54,28 @@ app.register_blueprint(patient_api)
 
 
 @app.route('/patients', methods=['GET'])
-def get_all_patients():
+#def get_all_patients():
+def get_priority_patient():
     patients = Patient.query.filter(Patient.treated.like('0'))
-    heap.arrange_into_heap(helper_functions.combine_results(patients))
+#    heap.arrange_into_heap(helper_functions.combine_results(patients))
+    # pop the element of the heap
+    if len(h) != 0:
+        next_patient = heapq.heappop(h)
+        #return jsonify({'patients': helper_functions.combine_results(patients)})
+        return jsonify({'patients': next_patient})
+    else:
+        return jsonify({'patients': helper_functions.combine_results(patients)})
 
-    return jsonify({'patients': helper_functions.combine_results(patients)})
+# helper function - can be moved to a different file if you want
 
+bleeding_dict = {"No": 0, "Little": 1, "Mild": 2, "Important": 5}
+
+def sum_values(patient):
+    bleeding_value = patient.bleeding #patients[i]['bleeding']
+    # if conscious == False, give 1
+    # unconscious --> 8
+    sum = patient.breathing_difficulty + int(patient.conscious == False) + patient.pain + bleeding_dict[bleeding_value]
+    return sum
 
 @app.route('/patient/add', methods=['POST'])
 def add_patient():
@@ -76,7 +96,13 @@ def add_patient():
                       )
     db.session.add(patient)
     db.session.commit()
-    print(new_uuid)
+    # Adding elements to the heap
+    priority_index = sum_values(patient)
+    print(f"priority_index: {priority_index}")
+    heapq.heappush(h, (priority_index, patient.public_id))
+    #print(new_uuid)
+    # Printing the heap
+    print(h)
     return jsonify({"message": "Patient added"})
 
 
