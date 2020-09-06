@@ -7,6 +7,7 @@ import sqlalchemy
 import helper_functions
 import uuid
 import heapq
+import json
 
 
 # import models
@@ -61,8 +62,13 @@ def get_priority_patient():
     # pop the element of the heap
     if len(h) != 0:
         next_patient = heapq.heappop(h)
-        #return jsonify({'patients': helper_functions.combine_results(patients)})
-        return jsonify({'patients': next_patient})
+        public_id = next_patient[1]
+        patient = Patient.query.filter_by(public_id=public_id).first()
+        patient.treated = 1
+        db.session.commit()
+        patient_data = helper_functions.allocate_data(patient)
+        # print(patient_data)
+        return jsonify({'patients': patient_data})
     else:
         return jsonify({'patients': None})
 
@@ -102,11 +108,11 @@ def add_patient():
     db.session.commit()
     # Adding elements to the heap
     priority_index = -1 * sum_values(patient)
-    print(f"priority_index: {priority_index}")
+    # print(f"priority_index: {priority_index}")
     heapq.heappush(h, (priority_index, patient.public_id))
     #print(new_uuid)
     # Printing the heap
-    print(h)
+    # print(h)
     return jsonify({"message": "Patient added"})
 
 
