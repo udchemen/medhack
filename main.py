@@ -5,6 +5,7 @@ import os
 import heap
 import sqlalchemy
 import helper_functions
+import uuid
 
 # import models
 
@@ -29,6 +30,7 @@ db = SQLAlchemy(app)
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(50), unique=True)
     first_name = db.Column(db.String(80), nullable=False)
     last_name = db.Column(db.String(80), nullable=False)
     address = db.Column(db.String(80), nullable=False)
@@ -58,7 +60,8 @@ def get_all_patients():
 @app.route('/patient/add', methods=['POST'])
 def add_patient():
     data = request.get_json()
-    patient = Patient(id=data['id'],
+    new_uuid = str(uuid.uuid4())
+    patient = Patient(public_id=new_uuid,
                       first_name=data['first_name'],
                       last_name=data['last_name'],
                       address=data['address'],
@@ -73,6 +76,7 @@ def add_patient():
                       )
     db.session.add(patient)
     db.session.commit()
+    print(new_uuid)
     return jsonify({"message": "Patient added"})
 
 
